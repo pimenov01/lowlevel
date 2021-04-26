@@ -1,0 +1,36 @@
+# "Фиктивные" цели
+.PHONY: all clean
+
+# Исходные файлы, необходимые для сборки библиотеки
+OBJS= pascal.c  \
+      computation.c
+
+#Вызываемые приложения
+AR = riscv64-unknown-elf-ar
+CC = riscv64-unknown-elf-gcc
+
+# Файл библиотеки
+MYLIBNAME = lib.a
+
+# Параметры компиляции
+CFLAGS= -O1
+
+# Включаемые файлы следует искать в текущем каталоге
+INCLUDES+= -I .
+
+# Make должна искать файлы *.h и *.c в текущей директории
+vpath %.h .
+vpath %.c .
+
+# Построение объектного файла из исходного текста
+# $< = %.c
+# $@ = %.o
+%.o: %.c
+	$(CC) -MD $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+# Чтобы достичь цели "all", требуется построить библиотеку
+all: $(MYLIBNAME)
+
+# $^ = (pascal.o, computation.o)
+$(MYLIBNAME): pascal.o computation.o
+	$(AR) -rsc $@ $^
